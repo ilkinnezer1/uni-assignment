@@ -1,24 +1,22 @@
 #include <iostream>
 #include <sstream>
 
-
 class HashTable{
     // Entry namespace limit
-    public: 
+public: 
     static const int NAMESIZE = 26;
-
-    struct Entry
-    {
+    struct Entry {
         std::string Data;
         std::string currentStatus = "never used";
     };
     
-
-    public:
+public:
+        // Default constructor
         HashTable() = default;
 
         void Add(const std::string& name){
-            bool isExist = FindString(name);
+            int outIndex; // unused index
+            bool isExist = FindString(name, outIndex);
 
             if(isExist == true) return;    
             
@@ -27,35 +25,38 @@ class HashTable{
             sizeOfEntries[insertIndex].currentStatus = "occupied";
         }
         void Delete(const std::string& name){
-            
+            int outIndex; // unused index
+            bool isExist = FindString(name, outIndex);
+
+            if(isExist == false) return;
+            sizeOfEntries[outIndex].currentStatus = "tombstone";
         }
         void Print(){
-            for (int i = 0; i < NAMESIZE; ++i)
-            {
-                std::cout << "Name" << sizeOfEntries[i].Data << " - " << "Status: " << sizeOfEntries[i].currentStatus << std::endl;
+            for (int i = 0; i < NAMESIZE; ++i){
+                std::cout << "Name: " << sizeOfEntries[i].Data << " - " << "Status: " << sizeOfEntries[i].currentStatus << std::endl;
             }
         }
 
-    private:
+private:
     //Hash function to find the index
     int getHashIndex(const std::string& name){
        //last character of name string
        return name.back() - 'a'; // Moving the ascii char
     }   
 
-    bool FindString(const std::string& name){
+    bool FindString(const std::string& name, int& outIndex){
         int hashIndex = getHashIndex(name);
 
         while(true){
 
             if(sizeOfEntries[hashIndex].Data == name){ // Found the index and data is the same 
+                outIndex = hashIndex;
                 return true;
             }
             if(sizeOfEntries[hashIndex].currentStatus == "never used"){
                    return false; 
-
             }     
-             hashIndex =(hashIndex + 1) % NAMESIZE; // Pass to the next one 
+            hashIndex =(hashIndex + 1) % NAMESIZE; // Pass to the next one 
         }
 
         return false;
@@ -73,7 +74,6 @@ class HashTable{
 
         return -1;
     }
-    
     Entry sizeOfEntries[NAMESIZE];
 };
 
@@ -101,7 +101,6 @@ int main(){
         } 
 
         std::cout<< token << std::endl;
-
     }
 
     hTable.Print();
